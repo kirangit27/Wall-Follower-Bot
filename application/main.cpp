@@ -5,7 +5,34 @@
 #include <vector>
 #include "simulator/simulator.h"
 
+void PrintStack(std::stack<std::array<int,2>> k, std::stack<char> d)
+{
+        // If stack is empty then return
+        if (k.empty())
+        return;
+        if (d.empty())
+        return;   
 
+        int x = k.top().at(0);
+        int y = k.top().at(1);
+        char z = d.top();
+
+        // Pop the top element of the stack
+        k.pop();
+        d.pop();
+
+        // Recursively call the function PrintStack
+        PrintStack(k,d);
+
+        // Print the stack element starting
+        // from the bottom
+        std::cerr<<"( "<< x <<","<< y <<" ), "<<z<<"\n";
+
+        // Push the same element onto the stack
+        // to preserve the order
+        k.push({x,y});
+        d.push(z);
+}
 
 int main(int argc, char *argv[])
 {
@@ -173,8 +200,11 @@ int main(int argc, char *argv[])
         case 'W' : new_direction = 'E';
                 break;
         }
+        
         std::cerr<<s.size()<<","<<dir.size()<<std::endl;
+        PrintStack(s,dir);
 
 
         return 0;
 }
+
