@@ -3,6 +3,8 @@
 #include <stack>
 #include <array>
 #include <vector>
+#include <cstdlib>   // rand() and srand()
+#include <ctime>     // For the time()
 #include "simulator/simulator.h"
 
 void PrintStack(std::stack<std::array<int,2>> k, std::stack<char> d)
@@ -34,6 +36,45 @@ void PrintStack(std::stack<std::array<int,2>> k, std::stack<char> d)
         d.push(z);
 }
 
+
+std::array<int,2> generate_goal()
+{
+        int x{};
+        int y{};
+        unsigned seed = time(0);
+       
+        // Seed the random number generator.
+        srand(seed);
+
+        x = rand()%16;          //generates random number between 0 and 15
+
+        do
+        {
+                if(x == 0 || x == 15)           //if x is either 0 or 15; y can be any number between 0 and 15
+                {       y = rand()%16;   }      //generates random number between 0 and 15               
+                else
+                {
+                        y = rand()%2;           //generates random number between 0 and 1
+                        if(y == 1)              //if y = 1, set it to 15; Thus y is either 0 or 15
+                        {       y = 15;  }
+                }
+
+        }while(x==0 &&y==0);            //ensures goal is not (0,0)
+                
+        std::cerr<<"GOAL : ("<<x<<","<<y<<")"<<std::endl;
+        if(y == 0)
+            Simulator::setWall(x,y, 's');
+        else if(y == 15)
+            Simulator::setWall(x,y, 'n');
+        else if(x == 0)
+            Simulator::setWall(x,y, 'w');
+        else
+            Simulator::setWall(x,y, 'e');
+
+        return {x,y};
+}
+
+
 int main(int argc, char *argv[])
 {
         // colorize and add text
@@ -58,7 +99,7 @@ int main(int argc, char *argv[])
         // move the robot back and forth
 
         // setting some walls for goal
-        std::array<int,2> goal{7,0};
+        std::array<int,2> goal{generate_goal()};
 
         //Simulator::setWall(8, 0, 's');
 
