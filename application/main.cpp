@@ -36,6 +36,25 @@ void PrintStack(std::stack<std::array<int,2>> k, std::stack<char> d)
         d.push(z);
 }
 
+void set_outer_walls()
+{
+        for(int i = 0; i<16; i++)
+        {
+                Simulator::setWall(i,0, 's');
+        }
+        for(int i = 0; i<16; i++)
+        {
+                Simulator::setWall(0,i, 'w');
+        }
+        for(int i = 0; i<16; i++)
+        {
+                Simulator::setWall(i,15, 'n');
+        }
+        for(int i = 0; i<16; i++)
+        {
+                Simulator::setWall(15,i, 'e');
+        }
+} 
 
 std::array<int,2> generate_goal()
 {
@@ -87,6 +106,8 @@ int main(int argc, char *argv[])
         Simulator::setColor(15, 0, 'G');
         Simulator::setText(15, 0, "D");
 
+        set_outer_walls();
+        
         std::stack<std::array<int,2>> s;            //stack to keep record of current position in terms of 2 element 1D array (x,y)
         s.push({0,0});
         std::cout<<s.top().at(0)<<","<<s.top().at(1)<<std::endl;
