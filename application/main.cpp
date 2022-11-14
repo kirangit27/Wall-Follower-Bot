@@ -491,10 +491,10 @@ int main(int argc, char *argv[])
         } 
 
 
-        std::cout<<"\n\n\nnew vector : size "<<cell_info.size()<<std::endl;
+        std::cerr<<"\n\n\nnew vector : size "<<cell_info.size()<<std::endl;
         for(int j = 0; j<cell_info.size();j++)
         {
-                std::cout<<cell_info.at(j).at(0)<<","<<cell_info.at(j).at(1)<<","<<cell_info.at(j).at(2)<<","<<cell_info.at(j).at(3)<<"----"<<j<<std::endl;
+                std::cerr<<cell_info.at(j).at(0)<<","<<cell_info.at(j).at(1)<<","<<cell_info.at(j).at(2)<<","<<cell_info.at(j).at(3)<<"----"<<j<<std::endl;
         }
 
 
@@ -513,165 +513,222 @@ int main(int argc, char *argv[])
                         Simulator::setColor(stoi(cell_info_copy.at(i).at(0)),stoi(cell_info_copy.at(i).at(1)),'R');
                 }
         }
-        //###################################################################################################################
-        /*
-        for(int i = 0;i<dead_end.size();i++)
+
+        
+        std::vector<char> return_dir;
+
+        for(int k = cell_info.size()-1; k >= 0 ; k--)
         {
-                for(int j = 0; j<cell_info.size();j++)
+                //if(cell_info.at(k).at(2))
+
+                switch(cell_info.at(k).at(2).at(0))
                 {
-                        if((std::to_string(dead_end.at(i).at(0)) == cell_info.at(j).at(0)) && (std::to_string(dead_end.at(i).at(1)) == cell_info.at(j).at(1)))
-                        {
-                                std::cerr<<"found grid at position : "<<j<<std::endl;
-                                cell_info.erase(cell_info.begin()+j);
-                        }
+                        case 'N' : return_dir.push_back('S');
+                                break;
+                        case 'S' : return_dir.push_back('N');
+                                break;
+                        case 'E' : return_dir.push_back('W');
+                                break;
+                        case 'W' : return_dir.push_back('E');
+                                break;                       
                 }
         }
 
-        int ctr{0};
-        do
-        {       ctr =0;
-                for(int k = 0 ; k<cell_info.size()-1 ; k++)
+        for(int i = 1; i<return_dir.size(); i++)
+        {
+                std::cerr<<"-->"<<return_dir.at(i)<<std::endl;
+        }
+
+        std::vector<std::array<int,2>> return_path;
+        for(int k = cell_info.size()-1; k >= 0 ; k--)
+        {
+                return_path.push_back({stoi(cell_info.at(k).at(0)),stoi(cell_info.at(k).at(1))});
+        }
+
+        for(int i = 0; i<return_path.size(); i++)
+        {
+                std::cerr<<"-->("<<return_path.at(i).at(0)<<","<<return_path.at(i).at(1)<<")"<<std::endl;
+                Simulator::setColor(return_path.at(i).at(0), return_path.at(i).at(1), 'G');
+        }
+
+        direction = new_direction;
+        //Simulator::moveForward();
+
+        for(int i=0;i<return_path.size()-1;i++)
+        {
+                int x1{return_path.at(i).at(0)};
+                int y1{return_path.at(i).at(1)};
+
+                int x2{return_path.at(i+1).at(0)};
+                int y2{return_path.at(i+1).at(1)};
+
+                int x_diff{x2-x1};
+                int y_diff{y2-y1};
+
+                Simulator::setColor(return_path.at(i).at(0),return_path.at(i).at(1), 'c');
+                std::cerr<<"("<<return_path.at(i).at(0)<<","<<return_path.at(i).at(1)<<")"<<std::endl;
+                std::cerr<<"|"<<x_diff<<","<<y_diff<<"|"<<std::endl;
+
+                /**
+                 * @brief Construct a new if object, used to traverse through unliked path 
+                 * 
+                 */
+                if(x_diff == 0  ||  y_diff ==0)
                 {
-                        if( (cell_info.at(k).at(0) == cell_info.at(k+1).at(0))  &&  (cell_info.at(k).at(1) == cell_info.at(k+1).at(1)) ) //&&  (cell_info.at(k).at(2) == cell_info.at(k+1).at(3))  &&  (cell_info.at(k).at(3) == cell_info.at(k+1).at(2)) )
+                        if(x_diff == 0 && (y_diff == 1 || y_diff == -1))
                         {
-                        if(  ( (cell_info.at(k).at(2) == "N" && cell_info.at(k+1).at(3) == "S") || 
-                                (cell_info.at(k).at(2) == "S" && cell_info.at(k+1).at(3) == "N") ||
-                                (cell_info.at(k).at(2) == "E" && cell_info.at(k+1).at(3) == "W") ||
-                                (cell_info.at(k).at(2) == "W" && cell_info.at(k+1).at(3) == "E")   ) &&
-                                ( (cell_info.at(k).at(3) == "N" && cell_info.at(k+1).at(2) == "S") || 
-                                (cell_info.at(k).at(3) == "S" && cell_info.at(k+1).at(2) == "N") ||
-                                (cell_info.at(k).at(3) == "E" && cell_info.at(k+1).at(2) == "W") ||
-                                (cell_info.at(k).at(3) == "W" && cell_info.at(k+1).at(2) == "E")   ))
+                                switch(direction)
                                 {
-                                        std::cerr<<"case found at : "<<k<<","<< k+1<<"; erased both\n";
-                                        Simulator::setColor(stoi(cell_info.at(k).at(0)),stoi(cell_info.at(k).at(1)),'R');
-                                        cell_info.erase(cell_info.begin()+k);
-                                        cell_info.erase(cell_info.begin()+k);
-                                        ctr++;
+                                        case 'N': Simulator::moveForward();
+                                                        new_direction='N';
+                                                break;
+                                        case 'S': Simulator::moveForward();
+                                                        new_direction='S';
+                                                break;
+                                        case 'E':  if(y_diff == 1)
+                                                        {
+                                                        Simulator::turnLeft();
+                                                        Simulator::moveForward();
+                                                        new_direction='N';         
+                                                        }
+                                                        else
+                                                        {
+                                                        Simulator::turnRight();
+                                                        Simulator::moveForward();
+                                                        new_direction='S';  
+                                                        }
+                                                break;
+                                        case 'W':  if(y_diff == 1)
+                                                        {
+                                                        Simulator::turnRight();
+                                                        Simulator::moveForward();
+                                                        new_direction='N';         
+                                                        }
+                                                        else
+                                                        {
+                                                        Simulator::turnLeft();
+                                                        Simulator::moveForward();
+                                                        new_direction='S';  
+                                                        }
+                                                break;  
                                 }
                         }
-                }
-                std::cerr<<"deleted;  current size: "<<cell_info.size()<<"\n";
-        }while(ctr!=0);    
+                        else if(y_diff == 0 && (x_diff == 1 || x_diff == -1))
+                        {
+                                switch(direction)
+                                {
+                                        case 'E': Simulator::moveForward();
+                                                        new_direction='E';
+                                                break;
+                                        case 'W': Simulator::moveForward();
+                                                        new_direction='W';
+                                                break;
+                                        case 'S':  if(x_diff == 1)
+                                                        {
+                                                        Simulator::turnLeft();
+                                                        Simulator::moveForward();
+                                                        new_direction='E';         
+                                                        }
+                                                        else
+                                                        {
+                                                        Simulator::turnRight();
+                                                        Simulator::moveForward();
+                                                        new_direction='W';  
+                                                        }
+                                                break;
+                                        case 'N':  if(x_diff == 1)
+                                                        {
+                                                        Simulator::turnRight();
+                                                        Simulator::moveForward();
+                                                        new_direction='E';         
+                                                        }
+                                                        else
+                                                        {
+                                                        Simulator::turnLeft();
+                                                        Simulator::moveForward();
+                                                        new_direction='W';  
+                                                        }
+                                                break;  
+                                }
+                        }
+                }   
+                direction = new_direction;
+        }     
 
-        std::cerr<<"\n\n\nnew vector : size - "<<cell_info.size()<<std::endl;
-        for(int j = 0; j<cell_info.size();j++)
-        {
-                std::cerr<<cell_info.at(j).at(0)<<","<<cell_info.at(j).at(1)<<","<<cell_info.at(j).at(2)<<","<<cell_info.at(j).at(3)<<"----"<<j<<std::endl;
-        }
-       */
 
-        
-
-        
-
-       /////next:
-       //follow reverse direction
-       //
-       //move only if absolut distance between nth and (n+2) is 2 i.e 2 diff options to take
-                      
 /*
-        
+        Simulator::moveForward();
         direction = new_direction;
-        while ((s.back().at(0) != 0) || (s.back().at(1) != 0))
+        for(int i = 1; i<return_dir.size(); i++)
         {
-        std::cerr<<"current position ("<<s.back().at(0)<<" , "<<s.back().at(1)<<")"<<std::endl;
-        if(Simulator::wallRight())
-        {
-                std::cerr << "--- right wall detected ---" <<std::endl;
-                if(Simulator::wallFront())
-                {
-                std::cerr << "--- front wall detected ---" <<std::endl;
-                if(Simulator::wallLeft())
-                {
-                        std::cerr << "--- left wall detected ---" <<std::endl;
-                        Simulator::turnRight();
-                        switch(direction)
-                        {
-                        case 'N' : new_direction = 'E';
-                                break;
-                        case 'S' : new_direction = 'W';
-                                break;
-                        case 'E' : new_direction = 'S';
-                                break;
-                        case 'W' : new_direction = 'N';
-                                break;
-                        }
-                        //Simulator::moveForward();
-                        std::cerr<<"current position ("<<s.back().at(0)<<" , "<<s.back().at(1)<<")"<<std::endl;
-                        std::cerr<<"facing "<<new_direction<<" direction"<<std::endl;
-                }
-                else
-                {
-                        Simulator::turnLeft();
-                        switch(direction)
-                        {
-                        case 'N' : new_direction = 'W';                                   
-                                        s.push_back({s.back().at(0)--,s.back().at(1)}); 
-                                break;
-                        case 'S' : new_direction = 'E';
-                                        s.push_back({s.back().at(0)++,s.back().at(1)});
-                                break;
-                        case 'E' : new_direction = 'N';
-                                        s.push_back({s.back().at(0),s.back().at(1)++});
-                                break;
-                        case 'W' : new_direction = 'S';
-                                        s.push_back({s.back().at(0),s.back().at(1)--});
-                                break;
-                        }
-                        Simulator::moveForward();
-                        Simulator::setColor(s.back().at(0),s.back().at(1), 'B');
-                        std::cerr<<"current position ("<<s.back().at(0)<<" , "<<s.back().at(1)<<")"<<std::endl;
-                        std::cerr<<"facing "<<new_direction<<" direction"<<std::endl;
-                }
-                }
-                else
-                {
-                switch(direction)
-                {
-                        case 'N' :s.push_back({s.back().at(0),s.back().at(1)++});                                
-                                break;
-                        case 'S' :s.push_back({s.back().at(0),s.back().at(1)--});
-                                break;
-                        case 'E' :s.push_back({s.back().at(0)++,s.back().at(1)});
-                                break;
-                        case 'W' :s.push_back({s.back().at(0)--,s.back().at(1)});
-                                break;
-                }
-                Simulator::moveForward();
-                Simulator::setColor(s.back().at(0),s.back().at(1), 'B');
-                new_direction = direction;
-                std::cerr<<"current position ("<<s.back().at(0)<<" , "<<s.back().at(1)<<")"<<std::endl;
-                std::cerr<<"facing "<<new_direction<<" direction"<<std::endl;
-                }
-        }
-        else
-        {
-                Simulator::turnRight();
-                switch(direction)
-                {
-                case 'N' : new_direction = 'E';
-                                s.push_back({s.back().at(0)++,s.back().at(1)});
-                        break;
-                case 'S' : new_direction = 'W';
-                                s.push_back({s.back().at(0)--,s.back().at(1)});
-                        break;
-                case 'E' : new_direction = 'S';
-                                s.push_back({s.back().at(0),s.back().at(1)--});
-                        break;
-                case 'W' : new_direction = 'N';
-                                s.push_back({s.back().at(0),s.back().at(1)++});
-                        break;
-                }
-                Simulator::moveForward();
-                Simulator::setColor(s.back().at(0),s.back().at(1), 'B');
-                std::cerr<<"current position ("<<s.back().at(0)<<" , "<<s.back().at(1)<<")"<<std::endl;
-                std::cerr<<"facing "<<new_direction<<" direction"<<std::endl;
-        }
 
-        direction = new_direction;
-        }
-        std::cerr<<"Back HOME"<<std::endl;
-        */
+                switch(direction)
+                {
+                        case 'N' :      switch(return_dir.at(i))  
+                                        {
+                                                case 'N':       Simulator::moveForward();
+                                                                new_direction = 'N';
+                                                                break;
+                                                case 'E':       Simulator::turnRight();
+                                                                Simulator::moveForward();
+                                                                new_direction = 'E';
+                                                                break;
+                                                case 'W':       Simulator::turnLeft();
+                                                                Simulator::moveForward();
+                                                                new_direction = 'W';
+                                                                break;
+                                        }
+                                        break;
+                        case 'S' :      switch(return_dir.at(i))  
+                                        {
+                                                case 'S':       Simulator::moveForward();
+                                                                new_direction = 'S';
+                                                                break;
+                                                case 'W':       Simulator::turnRight();
+                                                                Simulator::moveForward();
+                                                                new_direction = 'W';
+                                                                break;
+                                                case 'E':       Simulator::turnLeft();
+                                                                Simulator::moveForward();
+                                                                new_direction = 'E';
+                                                                break;
+                                        }
+                                        break;
+                        case 'E' :      switch(return_dir.at(i))  
+                                        {
+                                                case 'E':       Simulator::moveForward();
+                                                                new_direction = 'E';
+                                                                break;
+                                                case 'S':       Simulator::turnRight();
+                                                                Simulator::moveForward();
+                                                                new_direction = 'S';
+                                                                break;
+                                                case 'N':       Simulator::turnLeft();
+                                                                Simulator::moveForward();
+                                                                new_direction = 'N';
+                                                                break;
+                                        }
+                                        break;
+                        case 'W' :      switch(return_dir.at(i))  
+                                        {
+                                                case 'W':       Simulator::moveForward();
+                                                                new_direction = 'W';
+                                                                break;
+                                                case 'N':       Simulator::turnRight();
+                                                                Simulator::moveForward();
+                                                                new_direction = 'N';
+                                                                break;
+                                                case 'S':       Simulator::turnLeft();
+                                                                Simulator::moveForward();
+                                                                new_direction = 'S';
+                                                                break;
+                                        }
+                                        break;
+
+                }
+
+                direction = new_direction;
+        }*/
+
         return 0;
 }
