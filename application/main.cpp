@@ -244,6 +244,7 @@ int main(int argc, char *argv[])
 
         // setting some walls for goal
         std::array<int,2> goal{generate_goal()};
+        //std::array<int,2> goal{15,15};
 
         //Simulator::setWall(8, 0, 's');
 
@@ -468,8 +469,52 @@ int main(int argc, char *argv[])
                 std::cerr<<"{\""<<cell_info.at(i).at(0)<<"\",\""<<cell_info.at(i).at(1)<<"\",\""<<cell_info.at(i).at(2)<<"\",\""<<cell_info.at(i).at(3)<<"\"},"<<"   //"<<i<<std::endl;
         }
         
-        //###################################################################################################################
+        std::vector<std::array<std::string,4>> cell_info_copy;
+        cell_info_copy = cell_info;
 
+
+        for(int i = 0;i<cell_info.size();i++)
+        {
+                for(int j = cell_info.size()-1; j >= 0; j--)
+                {
+                        if((cell_info.at(i).at(0) == cell_info.at(j).at(0)) && (cell_info.at(i).at(1)) == cell_info.at(j).at(1) && i!=j)
+                        {
+                                std::cerr<<"Found : ("<<cell_info.at(i).at(0)<<","<<cell_info.at(i).at(1)<<") at "<<i<<" and "<<j<<std::endl;
+                                cell_info.erase(cell_info.begin()+i,cell_info.begin()+j);
+
+                                if(i > cell_info.size() || j > cell_info.size())
+                                {
+                                        break;
+                                }
+                        }
+                }
+        } 
+
+
+        std::cout<<"\n\n\nnew vector : size "<<cell_info.size()<<std::endl;
+        for(int j = 0; j<cell_info.size();j++)
+        {
+                std::cout<<cell_info.at(j).at(0)<<","<<cell_info.at(j).at(1)<<","<<cell_info.at(j).at(2)<<","<<cell_info.at(j).at(3)<<"----"<<j<<std::endl;
+        }
+
+
+        for(int i = 0; i<cell_info_copy.size(); i++)
+        { 
+                int ctr{0};
+                for(int j =0;j<cell_info.size();j++)
+                {
+                        if((cell_info_copy.at(i).at(0) == cell_info.at(j).at(0)) && (cell_info_copy.at(i).at(1) == cell_info.at(j).at(1)))
+                        {
+                                ctr++;
+                        }
+                }
+                if(ctr == 0)
+                {
+                        Simulator::setColor(stoi(cell_info_copy.at(i).at(0)),stoi(cell_info_copy.at(i).at(1)),'R');
+                }
+        }
+        //###################################################################################################################
+        /*
         for(int i = 0;i<dead_end.size();i++)
         {
                 for(int j = 0; j<cell_info.size();j++)
@@ -514,7 +559,11 @@ int main(int argc, char *argv[])
         {
                 std::cerr<<cell_info.at(j).at(0)<<","<<cell_info.at(j).at(1)<<","<<cell_info.at(j).at(2)<<","<<cell_info.at(j).at(3)<<"----"<<j<<std::endl;
         }
-      
+       */
+
+        
+
+        
 
        /////next:
        //follow reverse direction
