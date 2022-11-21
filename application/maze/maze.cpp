@@ -1,5 +1,5 @@
 #include "maze.h"
-#include "simulator/simulator.h"
+#include "../simulator/simulator.h"
 
 
 void rwa2group19::SetMaze::m_print_grind_numbers()
